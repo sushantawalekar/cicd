@@ -6,8 +6,7 @@ on:
       - main
 
 jobs:
-  test_deployment:
-    if: ${{ startsWith(github.ref, 'refs/heads/uat-') }}    
+  test_deployment:  
     runs-on: ubuntu-latest    
     environment: 
       name: TEST
