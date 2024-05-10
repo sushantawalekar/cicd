@@ -1,38 +1,35 @@
-name: ZCLI template
+name: Deploy Zendesk App
 
-# Triggers the workflow...
 on:
-  # ...when you push...
-  push:
-    # ...to branch "main" 
-    branches: [main]
-  # ...when you manually click "Run Workflow" on GitHub from the Actions page  
-  workflow_dispatch:
+  push:    
+    branches:
+      - main
 
-# If the worflow is triggered by one of the above options...
-
-# ...jobs will kick off to...
 jobs:
-  # ...create a build using...
-  build:
-    # ...the latest version of Ubuntu...
-    runs-on: ubuntu-latest
-    # ...using Node version 16.x...
+  test_deployment:
+    if: ${{ startsWith(github.ref, 'refs/heads/uat-') }}    
+    runs-on: ubuntu-latest    
+    environment: 
+      name: TEST
     strategy:
       matrix:
         node-version: [16.x]
-
-# With the environment setup, we can begin taking action...
-    
-    # ...with these steps...
-    steps:
-      # Until the next comment, these are default actions for the Node.js template from GitHub
+    env:
+      ZENDESK_SUBDOMAIN: ${{ secrets.SUBDOMAIN }}
+      ZENDESK_EMAIL: ${{ secrets.EMAIL }}
+      ZENDESK_API_TOKEN: ${{ secrets.API_TOKEN }}
+      APP_ID: ${{ vars.APP_ID }}
+    steps:      
       - uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
-          node-version: ${{ matrix.node-version }}
-          # Uncomment the next line only when using React
-          # cache: 'npm'
-      # ...install the Zendesk CLI
+          node-version: ${{ matrix.node-version }}          
       - name: Install zcli
+        run: npm i @zendesk/zcli -g
+      - name: Create zcli config
+        run: |
+          echo '{"app_id":'$APP_ID'}' > zcli.apps.config.json      
+          cat zcli.apps.config.json
+      - name: Deploy the app
+        run: zcli apps:update 
