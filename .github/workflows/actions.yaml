@@ -1,0 +1,38 @@
+name: ZCLI template
+
+# Triggers the workflow...
+on:
+  # ...when you push...
+  push:
+    # ...to branch "main" 
+    branches: [main]
+  # ...when you manually click "Run Workflow" on GitHub from the Actions page  
+  workflow_dispatch:
+
+# If the worflow is triggered by one of the above options...
+
+# ...jobs will kick off to...
+jobs:
+  # ...create a build using...
+  build:
+    # ...the latest version of Ubuntu...
+    runs-on: ubuntu-latest
+    # ...using Node version 16.x...
+    strategy:
+      matrix:
+        node-version: [16.x]
+
+# With the environment setup, we can begin taking action...
+    
+    # ...with these steps...
+    steps:
+      # Until the next comment, these are default actions for the Node.js template from GitHub
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          # Uncomment the next line only when using React
+          # cache: 'npm'
+      # ...install the Zendesk CLI
+      - name: Install zcli
